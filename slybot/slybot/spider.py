@@ -25,6 +25,12 @@ from slybot.utils import (
     include_exclude_filter, IndexedDict, iter_unique_scheme_hostname,
     load_plugin_names, load_plugins,
 )
+
+try:
+    from scrapy_splash.response import SplashJsonResponse
+    html_responses = (HtmlResponse, SplashJsonResponse)
+except ImportError:
+    html_responses = (HtmlResponse,)
 from w3lib.http import basic_auth_header
 
 STRING_KEYS = ['start_urls', 'exclude_patterns', 'follow_patterns',
@@ -196,7 +202,7 @@ class IblSpider(SitemapSpider):
             if url:
                 response._url = url
         content_type = response.headers.get('Content-Type', '')
-        if isinstance(response, HtmlResponse):
+        if isinstance(response, html_responses):
             return self.handle_html(response)
         if (isinstance(response, XmlResponse) or
                 response.url.endswith(('.xml', '.xml.gz'))):
